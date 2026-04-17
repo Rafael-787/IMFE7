@@ -1,0 +1,444 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      -->
+<title>Portico</title>
+<meta name="generator" content="MATLAB 25.2">
+<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/">
+<meta name="DC.date" content="2026-04-17">
+<meta name="DC.source" content="Portico.m">
+<style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style>
+</head>
+<body>
+<div class="content">
+<pre class="codeinput">clc;
+clear;
+<span class="comment">% C&aacute;lculo de portico</span>
+
+<span class="comment">% Importando valores</span>
+importNo = readtable(<span class="string">'Dados de entrada.xlsx'</span>, <span class="string">'Sheet'</span>, <span class="string">'Dados'</span>, <span class="string">'Range'</span>, <span class="string">'A3:I14'</span>);
+importNo = rmmissing(importNo)
+
+importBarra = readtable(<span class="string">'Dados de entrada.xlsx'</span>, <span class="string">'Sheet'</span>, <span class="string">'Dados'</span>, <span class="string">'Range'</span>, <span class="string">'L3:R14'</span>);
+importBarra = rmmissing(importBarra)
+
+<span class="comment">% Definindo valores nos objetos</span>
+<span class="keyword">for</span> i = 1:height(importNo) <span class="comment">% n&oacute;s</span>
+    id = importNo.Var1(i);
+    x = importNo.Coordenada(i);
+    y = importNo.Coordenada_1(i);
+    cx = importNo.Carga(i);
+    cy = importNo.Carga_1(i);
+    cr = importNo.Momento(i);
+    tx = double(importNo.Fixo(i));
+    ty = double(importNo.Fixo_1(i));
+    tr = double(importNo.Fixo_2(i));
+
+    no(id).coordenada = [x y]; <span class="comment">%(x,y)</span>
+    no(id).restricao = [tx ty tr]; <span class="comment">% 1 para travado e 0 para livre (x,y,rota&ccedil;&atilde;o)</span>
+    no(id).carga = [cx cy cr];
+
+<span class="keyword">end</span>
+
+<span class="keyword">for</span> i=1:height(importBarra)
+    id = importBarra.ID(i);
+    ni = importBarra.N_Incial(i);
+    nf = importBarra.N_Final(i);
+
+    barra(id).nos = [ni nf];
+    barra(id).elasticidade = importBarra.E_elasticidade_(i);
+    barra(id).area = importBarra.A__rea_(i);
+    barra(id).inercia = importBarra.I_in_rcia_(i);
+    barra(id).q = importBarra.q_cargaDistribu_da_(i);
+
+<span class="keyword">end</span>
+<span class="comment">% ___________________________________________________________________</span>
+
+<span class="comment">% Itera&ccedil;&atilde;o sobre as barras</span>
+<span class="keyword">for</span> i = 1:length(barra)
+    n1 = no(barra(i).nos(1));
+    n2 = no(barra(i).nos(2));
+    barra(i).comprimento = util.distancia(n1,n2);
+    barra(i).transformada = util.transformadaPortico(util.angulo(n1,n2));
+    barra(i).ke = KePortico(barra(i));
+
+    barra(i).ke_global = barra(i).transformada' * barra(i).ke * barra(i).transformada;
+<span class="keyword">end</span>
+
+<span class="comment">% Itera&ccedil;&atilde;o sobre nos</span>
+
+dof = length(no(1).restricao);
+
+<span class="comment">% Matriz global</span>
+
+KG = Kg(barra,no,dof);
+
+<span class="comment">% Adiciona condi&ccedil;&atilde;o de contorno na matriz global</span>
+
+trava = [no.restricao]';
+F = [no.carga]';
+
+<span class="comment">% Processamento das cargas distribu&iacute;das</span>
+<span class="keyword">for</span> i = 1:length(barra)
+
+    <span class="comment">% Verifica se a barra atual possui o par&acirc;metro 'q'</span>
+    <span class="keyword">if</span> isfield(barra, <span class="string">'q'</span>) &amp;&amp; ~isempty(barra(i).q)
+        q = barra(i).q;
+    <span class="keyword">else</span>
+        q = 0; <span class="comment">% Assume zero se o campo n&atilde;o existir</span>
+    <span class="keyword">end</span>
+    L = barra(i).comprimento;
+
+    <span class="comment">% Vetor de For&ccedil;as Nodais Equivalentes (Local) [Fx1, Fy1, M1, Fx2, Fy2, M2]'</span>
+    <span class="comment">% Assume q constante perpendicular ao eixo da barra</span>
+    barra(i).F_eq_local = [0; q*L/2; q*L^2/12; 0; q*L/2; -q*L^2/12];
+
+    <span class="comment">% Transforma para global e soma no vetor F da estrutura</span>
+    Mt = barra(i).transformada;
+    F_eq_global = Mt' * barra(i).F_eq_local;
+
+    no1 = barra(i).nos(1);
+    no2 = barra(i).nos(2);
+    gl_elemento = [(no1-1)*3+1 : no1*3, (no2-1)*3+1 : no2*3];
+
+    F(gl_elemento) = F(gl_elemento) - F_eq_global;
+<span class="keyword">end</span>
+
+<span class="keyword">for</span> i = 1:length(trava)
+    <span class="keyword">if</span> trava(i)
+        KG(:,i) = 0; <span class="comment">% Coluna</span>
+        KG(i,:) = 0; <span class="comment">% Linha</span>
+        KG(i,i) = 1; <span class="comment">% Diagonal</span>
+        F(i) = 0;
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">% Resolve deslocamentos</span>
+
+deslocamento = KG\F;
+
+<span class="keyword">for</span> i = 1:length(barra)
+    <span class="comment">% Identifica os graus de liberdade (GL) globais da barra atual</span>
+    n1 = barra(i).nos(1);
+    n2 = barra(i).nos(2);
+    gl_elemento = [(n1-1)*3+1 : n1*3, (n2-1)*3+1 : n2*3];
+
+    <span class="comment">% Extra&ccedil;&atilde;o e transforma&ccedil;&atilde;o</span>
+    deslocGlobalElemento = deslocamento(gl_elemento);
+
+    <span class="comment">% Salva resultados diretamente na estrutura da barra</span>
+    barra(i).deslocamentoLocal = barra(i).transformada * deslocGlobalElemento;
+    barra(i).forcaLocal = KePortico(barra(i)) * barra(i).deslocamentoLocal;
+
+    <span class="comment">% Soma as for&ccedil;as de engastamento perfeito (se existirem)</span>
+    <span class="keyword">if</span> isfield(barra, <span class="string">'F_eq_local'</span>) &amp;&amp; ~isempty(barra(i).F_eq_local)
+        barra(i).forcaLocal = barra(i).forcaLocal + barra(i).F_eq_local;
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">for</span> i = 1:length(barra)
+    disp(<span class="string">"Barra"</span> + i)
+    disp(<span class="string">"Deslocamento local"</span>)
+    disp(barra(i).deslocamentoLocal)
+    disp(<span class="string">"For&ccedil;aLocal"</span>)
+    disp(barra(i).forcaLocal)
+    disp(<span class="string">"________________________________"</span>)
+<span class="keyword">end</span>
+</pre>
+<pre class="codeoutput">
+importNo =
+
+  4&times;9 table
+
+    Var1    Coordenada    Fixo     Carga    Coordenada_1    Fixo_1    Carga_1    Fixo_2    Momento
+    ____    __________    _____    _____    ____________    ______    _______    ______    _______
+
+     1           0        true       0             0        true          0      true          0  
+     2         100        false      0             0        false       -10      false      1000  
+     3         150        false      0         -37.5        false       -20      false         0  
+     4         200        true       0            75        true          0      true          0  
+
+Warning: Column headers from the file were modified to make them valid MATLAB
+identifiers before creating variable names for the table. The original column
+headers are saved in the VariableDescriptions property.
+Set 'VariableNamingRule' to 'preserve' to use the original column headers as
+table variable names. 
+
+importBarra =
+
+  3&times;7 table
+
+    ID    N_Incial    N_Final    A__rea_    E_elasticidade_    I_in_rcia_    q_cargaDistribu_da_
+    __    ________    _______    _______    _______________    __________    ___________________
+
+    1        1           2         10            10000            1000              0.24        
+    2        2           3         10            10000            1000                 0        
+    3        3           4         10            10000            1000                 0        
+
+Barra1
+Deslocamento local
+         0
+         0
+         0
+    0.0082
+   -0.1286
+    0.0014
+
+For&ccedil;aLocal
+   1.0e+03 *
+
+   -0.0082
+    0.0356
+    1.2438
+    0.0082
+   -0.0116
+    1.1157
+
+________________________________
+Barra2
+Deslocamento local
+    0.0837
+   -0.0980
+    0.0014
+    0.0884
+   -0.0052
+    0.0014
+
+For&ccedil;aLocal
+   -7.4833
+   -3.6193
+ -115.6897
+    7.4833
+    3.6193
+ -110.5167
+
+________________________________
+Barra3
+Deslocamento local
+   -0.0248
+   -0.0850
+    0.0014
+         0
+         0
+         0
+
+For&ccedil;aLocal
+  -20.1325
+   -0.0201
+  110.5167
+   20.1325
+    0.0201
+ -112.9872
+
+________________________________
+</pre>
+<p class="footer">
+<br>
+<a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2025b</a>
+<br>
+</p>
+</div>
+<!--
+##### SOURCE BEGIN #####
+clc;
+clear;
+% Cálculo de portico
+
+% Importando valores
+importNo = readtable('Dados de entrada.xlsx', 'Sheet', 'Dados', 'Range', 'A3:I14');
+importNo = rmmissing(importNo)
+
+importBarra = readtable('Dados de entrada.xlsx', 'Sheet', 'Dados', 'Range', 'L3:R14');
+importBarra = rmmissing(importBarra)
+
+% Definindo valores nos objetos
+for i = 1:height(importNo) % nós
+    id = importNo.Var1(i);
+    x = importNo.Coordenada(i);
+    y = importNo.Coordenada_1(i);
+    cx = importNo.Carga(i);
+    cy = importNo.Carga_1(i);
+    cr = importNo.Momento(i);
+    tx = double(importNo.Fixo(i));
+    ty = double(importNo.Fixo_1(i));
+    tr = double(importNo.Fixo_2(i));
+
+    no(id).coordenada = [x y]; %(x,y)
+    no(id).restricao = [tx ty tr]; % 1 para travado e 0 para livre (x,y,rotação)
+    no(id).carga = [cx cy cr];
+
+end
+
+for i=1:height(importBarra)
+    id = importBarra.ID(i);
+    ni = importBarra.N_Incial(i);
+    nf = importBarra.N_Final(i);
+
+    barra(id).nos = [ni nf];
+    barra(id).elasticidade = importBarra.E_elasticidade_(i);
+    barra(id).area = importBarra.A__rea_(i);
+    barra(id).inercia = importBarra.I_in_rcia_(i);
+    barra(id).q = importBarra.q_cargaDistribu_da_(i);
+
+end
+% ___________________________________________________________________
+
+% Iteração sobre as barras
+for i = 1:length(barra)
+    n1 = no(barra(i).nos(1));
+    n2 = no(barra(i).nos(2));
+    barra(i).comprimento = util.distancia(n1,n2); 
+    barra(i).transformada = util.transformadaPortico(util.angulo(n1,n2));
+    barra(i).ke = KePortico(barra(i));
+
+    barra(i).ke_global = barra(i).transformada' * barra(i).ke * barra(i).transformada;
+end
+
+% Iteração sobre nos
+
+dof = length(no(1).restricao);
+
+% Matriz global
+
+KG = Kg(barra,no,dof);
+
+% Adiciona condição de contorno na matriz global
+
+trava = [no.restricao]';
+F = [no.carga]';
+
+% Processamento das cargas distribuídas
+for i = 1:length(barra)
+
+    % Verifica se a barra atual possui o parâmetro 'q'
+    if isfield(barra, 'q') && ~isempty(barra(i).q)
+        q = barra(i).q;
+    else
+        q = 0; % Assume zero se o campo não existir
+    end
+    L = barra(i).comprimento;
+    
+    % Vetor de Forças Nodais Equivalentes (Local) [Fx1, Fy1, M1, Fx2, Fy2, M2]'
+    % Assume q constante perpendicular ao eixo da barra
+    barra(i).F_eq_local = [0; q*L/2; q*L^2/12; 0; q*L/2; -q*L^2/12];
+    
+    % Transforma para global e soma no vetor F da estrutura
+    Mt = barra(i).transformada;
+    F_eq_global = Mt' * barra(i).F_eq_local;
+    
+    no1 = barra(i).nos(1);
+    no2 = barra(i).nos(2);
+    gl_elemento = [(no1-1)*3+1 : no1*3, (no2-1)*3+1 : no2*3]; 
+    
+    F(gl_elemento) = F(gl_elemento) - F_eq_global;
+end
+
+for i = 1:length(trava)
+    if trava(i)
+        KG(:,i) = 0; % Coluna
+        KG(i,:) = 0; % Linha
+        KG(i,i) = 1; % Diagonal
+        F(i) = 0;
+    end
+end
+
+% Resolve deslocamentos
+
+deslocamento = KG\F;
+
+for i = 1:length(barra)
+    % Identifica os graus de liberdade (GL) globais da barra atual
+    n1 = barra(i).nos(1);
+    n2 = barra(i).nos(2);
+    gl_elemento = [(n1-1)*3+1 : n1*3, (n2-1)*3+1 : n2*3]; 
+    
+    % Extração e transformação
+    deslocGlobalElemento = deslocamento(gl_elemento);
+    
+    % Salva resultados diretamente na estrutura da barra
+    barra(i).deslocamentoLocal = barra(i).transformada * deslocGlobalElemento;
+    barra(i).forcaLocal = KePortico(barra(i)) * barra(i).deslocamentoLocal;
+
+    % Soma as forças de engastamento perfeito (se existirem)
+    if isfield(barra, 'F_eq_local') && ~isempty(barra(i).F_eq_local)
+        barra(i).forcaLocal = barra(i).forcaLocal + barra(i).F_eq_local;
+    end
+end
+
+for i = 1:length(barra)
+    disp("Barra" + i)
+    disp("Deslocamento local")
+    disp(barra(i).deslocamentoLocal)
+    disp("ForçaLocal")
+    disp(barra(i).forcaLocal)
+    disp("________________________________")
+end
+##### SOURCE END #####
+-->
+</body>
+</html>
